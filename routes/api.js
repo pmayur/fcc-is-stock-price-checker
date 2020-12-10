@@ -1,17 +1,9 @@
 "use strict";
-const helmet = require("helmet");
 const axios  = require("axios");
 
 let database = require("../db/database")
 
 module.exports = function (app) {
-    app.use(
-        helmet.contentSecurityPolicy({
-            directives: {
-                defaultSrc: ["'self'"],
-            },
-        })
-    );
 
     app.route("/api/stock-prices").get( async function (req, res) {
 
