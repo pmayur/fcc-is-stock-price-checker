@@ -9,11 +9,25 @@ module.exports = function (app) {
 
         let ip          = req.connection.remoteAddress;
         let isLiked     = convertToBoolean(req.query.like);
-        let stock       = req.query.stock.toUpperCase();
+        let stock       = req.query.stock;
 
         try {
 
-            stock = await getStockData(stock, ip, isLiked);
+            // if multiple stocks are provided
+            if(Array.isArray(stock)) {
+
+                stock = toUpCase(stock)
+
+                stock[0] = await getStockData(stock[0], ip, isLiked)
+                stock[1] = await getStockData(stock[1], ip, isLiked)
+
+                // converts likes to rel_likes
+                getRelLikes(stock)
+
+            } else {
+
+                stock = await getStockData(toUpCase(stock), ip, isLiked)
+            }
 
         } catch (error) {
             return res.json(error)
@@ -112,4 +126,27 @@ function getLikes(stock, ip, isLiked) {
 // returns true / false from boolean string provided
 function convertToBoolean(bool) {
     return (String(bool) == "true");
+}
+
+// returns upcase array of strings or upcase of string passed
+function toUpCase(stock) {
+
+    if(Array.isArray(stock)) {
+        return stock.map( elem => elem.toUpperCase())
+
+    } else return stock.toUpperCase()
+
+}
+
+// converts likes in the stock to rel_like
+function getRelLikes(stock) {
+    let likes = []
+
+    stock.forEach(element => {
+        likes.push(element.likes)
+        delete element.likes
+    });
+
+    stock[0].rel_likes = likes[0] - likes[1];
+    stock[1].rel_likes = likes[1] - likes[0];
 }
