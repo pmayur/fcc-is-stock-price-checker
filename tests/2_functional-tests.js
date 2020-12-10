@@ -129,4 +129,67 @@ suite('Functional Tests', function() {
             })
     })
 
+
+    test('Viewing two stocks', function(done) {
+
+        let stock = ['goog', 'msft'];
+        let like = 'false';
+
+        chai.request(server)
+            .get('/api/stock-prices')
+            .query({ stock, like })
+            .end( function(err, res) {
+                let data = res.body.stockData;
+
+                assert.equal(res.status, 200)
+                assert.exists(res.body.stockData)
+                assert.notExists(err)
+                assert.isArray(data)
+                assert.equal(data.length, 2)
+
+                data.forEach((element, index) => {
+
+                    assert.exists(element.stock)
+                    assert.exists(element.price)
+                    assert.exists(element.rel_likes)
+                    assert.equal(element.stock, stock[index].toUpperCase())
+                    assert.isNumber(element.price)
+                });
+
+                done()
+
+            })
+    })
+
+    test('Viewing two stocks', function(done) {
+
+        let stock = ['goog', 'msft'];
+        let like = 'true';
+
+        chai.request(server)
+            .get('/api/stock-prices')
+            .query({ stock, like })
+            .end( function(err, res) {
+                let data = res.body.stockData;
+
+                assert.equal(res.status, 200)
+                assert.exists(res.body.stockData)
+                assert.notExists(err)
+                assert.isArray(data)
+                assert.equal(data.length, 2)
+
+                data.forEach((element, index) => {
+
+                    assert.exists(element.stock)
+                    assert.exists(element.price)
+                    assert.exists(element.rel_likes)
+                    assert.equal(element.stock, stock[index].toUpperCase())
+                    assert.isNumber(element.price)
+                });
+
+                done()
+
+            })
+    })
+
 });
